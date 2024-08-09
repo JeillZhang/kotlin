@@ -26365,6 +26365,12 @@ public class DiagnosticTestGenerated extends AbstractDiagnosticTest {
       }
 
       @Test
+      @TestMetadata("delegationToTypeParameterWithBond.kt")
+      public void testDelegationToTypeParameterWithBond() {
+        runTest("compiler/testData/diagnostics/tests/multiplatform/delegationToTypeParameterWithBond.kt");
+      }
+
+      @Test
       @TestMetadata("delegationWithIntersectionAndTypeParameters.kt")
       public void testDelegationWithIntersectionAndTypeParameters() {
         runTest("compiler/testData/diagnostics/tests/multiplatform/delegationWithIntersectionAndTypeParameters.kt");
@@ -27677,22 +27683,6 @@ public class DiagnosticTestGenerated extends AbstractDiagnosticTest {
           public void testSubstitutionOverride() {
             runTest("compiler/testData/diagnostics/tests/multiplatform/defaultArguments/methodDefaultArgsViaActualFakeOverride/substitutionOverride.kt");
           }
-        }
-      }
-
-      @Nested
-      @TestMetadata("compiler/testData/diagnostics/tests/multiplatform/deprecated")
-      @TestDataPath("$PROJECT_ROOT")
-      public class Deprecated {
-        @Test
-        public void testAllFilesPresentInDeprecated() {
-          KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/diagnostics/tests/multiplatform/deprecated"), Pattern.compile("^(.*)\\.kts?$"), Pattern.compile("^(.+)\\.(reversed|fir|ll|latestLV)\\.kts?$"), true);
-        }
-
-        @Test
-        @TestMetadata("header.kt")
-        public void testHeader() {
-          runTest("compiler/testData/diagnostics/tests/multiplatform/deprecated/header.kt");
         }
       }
 
@@ -40434,6 +40424,12 @@ public class DiagnosticTestGenerated extends AbstractDiagnosticTest {
       @TestMetadata("incorrectLTGTFallback.kt")
       public void testIncorrectLTGTFallback() {
         runTest("compiler/testData/diagnostics/tests/syntax/incorrectLTGTFallback.kt");
+      }
+
+      @Test
+      @TestMetadata("legacyHeaderAndImplKeywordsInEnumDefinition.kt")
+      public void testLegacyHeaderAndImplKeywordsInEnumDefinition() {
+        runTest("compiler/testData/diagnostics/tests/syntax/legacyHeaderAndImplKeywordsInEnumDefinition.kt");
       }
     }
 

@@ -158,6 +158,12 @@ public class FirOldFrontendMPPDiagnosticsWithPsiTestGenerated extends AbstractFi
   }
 
   @Test
+  @TestMetadata("delegationToTypeParameterWithBond.kt")
+  public void testDelegationToTypeParameterWithBond() {
+    runTest("compiler/testData/diagnostics/tests/multiplatform/delegationToTypeParameterWithBond.kt");
+  }
+
+  @Test
   @TestMetadata("delegationWithIntersectionAndTypeParameters.kt")
   public void testDelegationWithIntersectionAndTypeParameters() {
     runTest("compiler/testData/diagnostics/tests/multiplatform/delegationWithIntersectionAndTypeParameters.kt");
@@ -1470,22 +1476,6 @@ public class FirOldFrontendMPPDiagnosticsWithPsiTestGenerated extends AbstractFi
       public void testSubstitutionOverride() {
         runTest("compiler/testData/diagnostics/tests/multiplatform/defaultArguments/methodDefaultArgsViaActualFakeOverride/substitutionOverride.kt");
       }
-    }
-  }
-
-  @Nested
-  @TestMetadata("compiler/testData/diagnostics/tests/multiplatform/deprecated")
-  @TestDataPath("$PROJECT_ROOT")
-  public class Deprecated {
-    @Test
-    public void testAllFilesPresentInDeprecated() {
-      KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/diagnostics/tests/multiplatform/deprecated"), Pattern.compile("^(.*)\\.kts?$"), Pattern.compile("^(.+)\\.(reversed|fir|ll|latestLV)\\.kts?$"), TargetBackend.JVM_IR, true);
-    }
-
-    @Test
-    @TestMetadata("header.kt")
-    public void testHeader() {
-      runTest("compiler/testData/diagnostics/tests/multiplatform/deprecated/header.kt");
     }
   }
 
