@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.konan.test
 
 import org.jetbrains.kotlin.backend.common.serialization.CompatibilityMode
+import org.jetbrains.kotlin.backend.common.serialization.IrSerializationSettings
 import org.jetbrains.kotlin.backend.common.serialization.SerializerOutput
 import org.jetbrains.kotlin.backend.common.serialization.metadata.KlibMetadataMonolithicSerializer
 import org.jetbrains.kotlin.backend.common.serialization.serializeModuleIntoKlib
@@ -36,6 +37,7 @@ import org.jetbrains.kotlin.test.frontend.fir.resolveLibraries
 import org.jetbrains.kotlin.test.model.*
 import org.jetbrains.kotlin.test.services.*
 import org.jetbrains.kotlin.test.services.configuration.NativeEnvironmentConfigurator.Companion.getKlibArtifactFile
+import org.jetbrains.kotlin.test.services.configuration.nativeEnvironmentConfigurator
 import org.jetbrains.kotlin.utils.metadataVersion
 
 abstract class AbstractNativeKlibSerializerFacade(
@@ -67,7 +69,7 @@ abstract class AbstractNativeKlibSerializerFacade(
                 compilerVersion = KotlinCompilerVersion.getVersion(),
                 metadataVersion = configuration.metadataVersion().toString(),
             ),
-            target = HostManager.host,
+            target = testServices.nativeEnvironmentConfigurator.getNativeTarget(module),
             output = outputArtifact.outputFile.path,
             moduleName = configuration.getNotNull(CommonConfigurationKeys.MODULE_NAME),
             nopack = true,
@@ -122,13 +124,14 @@ class ClassicNativeKlibSerializerFacade(testServices: TestServices) : AbstractNa
         ).serializeModule(frontendOutput.analysisResult.moduleDescriptor)
 
         val serializerIr = KonanIrModuleSerializer(
+            settings = IrSerializationSettings(
+                languageVersionSettings = configuration.languageVersionSettings,
+                normalizeAbsolutePaths = configuration.getBoolean(KlibConfigurationKeys.KLIB_NORMALIZE_ABSOLUTE_PATH),
+                sourceBaseDirs = configuration.getList(KlibConfigurationKeys.KLIB_RELATIVE_PATH_BASES),
+                shouldCheckSignaturesOnUniqueness = configuration.get(KlibConfigurationKeys.PRODUCE_KLIB_SIGNATURES_CLASH_CHECKS, true)
+            ),
             KtDiagnosticReporterWithImplicitIrBasedContext(inputArtifact.diagnosticReporter, configuration.languageVersionSettings),
             inputArtifact.irPluginContext.irBuiltIns,
-            CompatibilityMode.CURRENT,
-            normalizeAbsolutePaths = configuration.getBoolean(KlibConfigurationKeys.KLIB_NORMALIZE_ABSOLUTE_PATH),
-            sourceBaseDirs = configuration.getList(KlibConfigurationKeys.KLIB_RELATIVE_PATH_BASES),
-            configuration.languageVersionSettings,
-            shouldCheckSignaturesOnUniqueness = configuration.get(KlibConfigurationKeys.PRODUCE_KLIB_SIGNATURES_CLASH_CHECKS, true)
         ).serializedIrModule(inputArtifact.irModuleFragment)
 
         return SerializerOutput(
@@ -194,15 +197,15 @@ class FirNativeKlibSerializerFacade(testServices: TestServices) : AbstractNative
                 shouldCheckSignaturesOnUniqueness,
             ->
             KonanIrModuleSerializer(
+                settings = IrSerializationSettings(
+                    compatibilityMode = compatibilityMode,
+                    normalizeAbsolutePaths = normalizeAbsolutePaths,
+                    sourceBaseDirs = sourceBaseDirs,
+                    languageVersionSettings = languageVersionSettings,
+                    shouldCheckSignaturesOnUniqueness = shouldCheckSignaturesOnUniqueness,
+                ),
                 diagnosticReporter = irDiagnosticReporter,
                 irBuiltIns = irBuiltIns,
-                compatibilityMode = compatibilityMode,
-                normalizeAbsolutePaths = normalizeAbsolutePaths,
-                sourceBaseDirs = sourceBaseDirs,
-                languageVersionSettings = languageVersionSettings,
-                bodiesOnlyForInlines = false,
-                publicAbiOnly = false,
-                shouldCheckSignaturesOnUniqueness = shouldCheckSignaturesOnUniqueness,
             )
         },
         inputArtifact.metadataSerializer ?: error("expected metadata serializer"),
